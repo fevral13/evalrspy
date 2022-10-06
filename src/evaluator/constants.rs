@@ -1,4 +1,5 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
+pub const DEFAULT_TIMEOUT: u64 = 500;
 pub const JS_PRELUDE: &str = r#"
 function sqrt(x) {
     if (!isNumeric(x) || x < 0) {
