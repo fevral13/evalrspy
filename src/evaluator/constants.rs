@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub const JS_PRELUDE: &str = r#"
 function sqrt(x) {
     if (!isNumeric(x) || x < 0) {
