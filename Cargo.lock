@@ -29,6 +29,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "deno_core"
 version = "0.114.0"
+source = "git+https://github.com/fevral13/deno.git?branch=patched#fe1c73b8ab03afdbb2db93f969d7af918cb6017a"
 dependencies = [
  "anyhow",
  "futures",
@@ -522,6 +523,7 @@ dependencies = [
 [[package]]
 name = "serde_v8"
 version = "0.25.0"
+source = "git+https://github.com/fevral13/deno.git?branch=patched#fe1c73b8ab03afdbb2db93f969d7af918cb6017a"
 dependencies = [
  "serde",
  "serde_bytes",
