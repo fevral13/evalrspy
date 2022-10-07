@@ -58,8 +58,8 @@ pub fn evaluate(request: String) -> String {
 fn evaluate_inner(request: String) -> Result<Value, EvalrsError> {
     let request_data = parse_request(&request)?;
     let raw_script = render_script(&request_data.variables)?;
-    let evaluator = get_script_evaluator(&raw_script, request_data.timeout)?;
-    evaluate_script(evaluator, &request_data.script, &request_data.variables)
+    let evaluator = get_script_evaluator(&raw_script)?;
+    evaluate_script(evaluator, &request_data.script, &request_data.variables, request_data.timeout)
 }
 
 fn parse_request(request_string: &str) -> Result<Request, EvalrsError> {
@@ -88,11 +88,9 @@ fn render_script(variables: &Value) -> Result<String, EvalrsError> {
     ))
 }
 
-fn get_script_evaluator(script_code: &str, timeout: u64) -> Result<Script, EvalrsError> {
-    let duration = Duration::from_millis(timeout);
-
+fn get_script_evaluator(script_code: &str) -> Result<Script, EvalrsError> {
     match Script::from_string(script_code) {
-        Ok(evaluator) => Ok(evaluator.with_timeout(duration)),
+        Ok(evaluator) => Ok(evaluator),
         Err(error) => Err(EvalrsError::WrongScriptCode { source: error }),
     }
 }
@@ -101,10 +99,16 @@ fn evaluate_script(
     mut evaluator: Script,
     script: &String,
     variables: &Value,
+    timeout: u64
 ) -> Result<Value, EvalrsError> {
-    match evaluator.call(
+    // let duration = Duration::from_millis(timeout);
+
+    match evaluator.call::<Value, Value>(
         "wrapper",
-        (Value::String(script.clone()), variables.clone()),
+        &Value::Array(vec![
+            Value::String(script.clone()), variables.clone()
+        ]),
+        Some(timeout)
     ) {
         Ok(result) => Ok(result),
         Err(error) => Err(EvalrsError::ScriptEvaluationError { source: error }),
