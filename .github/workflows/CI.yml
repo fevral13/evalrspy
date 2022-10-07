@@ -15,6 +15,7 @@ jobs:
     - uses: messense/maturin-action@v1
       with:
         manylinux: auto
+        musllinux: 1.2
         command: build
         args: --release --sdist -o dist --find-interpreter
     - name: Upload wheels
