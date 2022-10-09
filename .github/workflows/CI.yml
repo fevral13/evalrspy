@@ -22,13 +22,13 @@ jobs:
         CFLAGS_armv7_unknown_linux_musleabihf: '-mfpu=vfpv3-d16'
     steps:
       - uses: actions/checkout@v2
-      - name: Build Wheels - manylinux
-        uses: messense/maturin-action@main
-        with:
-          target: ${{ matrix.platform.target }}
-          manylinux: auto
-          container: off
-          args: --release -o dist
+#      - name: Build Wheels - manylinux
+#        uses: messense/maturin-action@main
+#        with:
+#          target: ${{ matrix.platform.target }}
+#          manylinux: auto
+#          container: off
+#          args: --release -o dist
       - name: Build Wheels - musllinux
         uses: messense/maturin-action@main
         with:
