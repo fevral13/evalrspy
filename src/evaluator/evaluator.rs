@@ -1,13 +1,13 @@
 use js_sandbox::{AnyError, Script};
 use pyo3::prelude::*;
-use serde::{self, Deserialize};
+use serde;
 use serde_json::{self, Value};
 use std::time::Duration;
 use thiserror;
 
 use super::constants::{DEFAULT_TIMEOUT, JS_PRELUDE};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct Request {
     pub script: String,
     pub variables: Value,
@@ -24,16 +24,16 @@ impl Request {
 #[derive(thiserror::Error, Debug)]
 enum EvalrsError {
     #[error("Wrong argument structure")]
-    WrongArguments,
+    WrongArguments(#[source] serde_json::Error),
 
     #[error("Variables must be a dict")]
     WrongVariablesType,
 
     #[error("Script is not a valid JS code")]
-    WrongScriptCode { source: AnyError },
+    WrongScriptCode(#[source] AnyError),
 
     #[error("Script evaluation error")]
-    ScriptEvaluationError { source: AnyError },
+    ScriptEvaluationError(#[source] AnyError),
 }
 
 #[pyfunction]
@@ -67,7 +67,7 @@ fn parse_request(request_string: &str) -> Result<Request, EvalrsError> {
 
     match parse_result {
         Ok(request) => Ok(request),
-        Err(_) => Err(EvalrsError::WrongArguments),
+        Err(error) => Err(EvalrsError::WrongArguments(error)),
     }
 }
 
@@ -93,7 +93,7 @@ fn get_script_evaluator(script_code: &str, timeout: u64) -> Result<Script, Evalr
 
     match Script::from_string(script_code) {
         Ok(evaluator) => Ok(evaluator.with_timeout(duration)),
-        Err(error) => Err(EvalrsError::WrongScriptCode { source: error }),
+        Err(error) => Err(EvalrsError::WrongScriptCode(error)),
     }
 }
 
@@ -107,7 +107,7 @@ fn evaluate_script(
         (Value::String(script.clone()), variables.clone()),
     ) {
         Ok(result) => Ok(result),
-        Err(error) => Err(EvalrsError::ScriptEvaluationError { source: error }),
+        Err(error) => Err(EvalrsError::ScriptEvaluationError(error)),
     }
 }
 
